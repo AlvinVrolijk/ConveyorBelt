@@ -1,0 +1,7 @@
+name: ConveyorBelt
+version: ${project.version}
+main: nl.alvinvrolijk.conveyorbelt.ConveyorBelt
+api-version: 1.13
+authors: [AlvinCraft]
+description: A conveyor belt plugin.
+website: https://github.com/AlvinVrolijk/ConveyorBelt
