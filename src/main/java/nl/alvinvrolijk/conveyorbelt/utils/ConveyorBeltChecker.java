@@ -95,7 +95,7 @@ public class ConveyorBeltChecker {
      * @param location Location
      */
     private void powerBlock(Location location) {
-        int radius = 2;
+        int radius = new Config(ConveyorBelt.instance, false).get().getInt("radius");
 
         for (int x = -(radius); x <= radius; x++) {
             for (int y = -(radius); y <= radius; y++) {
