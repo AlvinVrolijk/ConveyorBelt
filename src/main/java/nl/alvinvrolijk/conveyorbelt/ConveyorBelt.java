@@ -2,6 +2,7 @@ package nl.alvinvrolijk.conveyorbelt;
 
 import nl.alvinvrolijk.conveyorbelt.utils.Config;
 import nl.alvinvrolijk.conveyorbelt.utils.ConveyorBeltChecker;
+import nl.alvinvrolijk.conveyorbelt.utils.Listeners;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -19,7 +20,9 @@ public final class ConveyorBelt extends JavaPlugin {
 
         new Config(this, true); // Get config file
 
-        new ConveyorBeltChecker();
+        new ConveyorBeltChecker(); // Start runnable
+
+        getServer().getPluginManager().registerEvents(new Listeners(this), this); // Register listeners
 
         logger.info("Plugin enabled"); // Inform console that the plugin is enabled
     }

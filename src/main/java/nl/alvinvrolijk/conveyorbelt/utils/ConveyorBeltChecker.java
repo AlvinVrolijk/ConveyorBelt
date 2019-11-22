@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Repeater;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.Entity;
@@ -31,6 +32,7 @@ public class ConveyorBeltChecker {
 
                             int rate;
                             rate = repeater.getDelay();
+
                             if (repeater.isPowered()) {
                                 rate = rate * 3;
                             }
@@ -41,26 +43,65 @@ public class ConveyorBeltChecker {
 
                         if (block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.PURPUR_STAIRS)) {
                             Stairs stairs = (Stairs) block.getLocation().subtract(0, 1, 0).getBlock().getBlockData();
-                            speed = speed + 1;
-                            direction = faceToForce(stairs.getFacing().getOppositeFace());
+
+                            if (stairs.getHalf().equals(Bisected.Half.BOTTOM)) {
+                                direction = faceToForce(stairs.getFacing().getOppositeFace());
+                                direction.setY(0.05);
+                                speed = speed + 2;
+                            } else {
+                                direction = faceToForce(stairs.getFacing().getOppositeFace());
+                                speed = speed + 1;
+                            }
                         }
 
                         if (block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.SLIME_BLOCK) || block.getType().equals(Material.SLIME_BLOCK)) {
-                            direction = new Vector(0, 0.02, 0);
+                            direction = new Vector(0, 0, 0);
+                            direction.setY(0.5);
                             speed = speed + 1;
                         }
 
                         if (speed != 0 && direction != null) {
-                            if (entity.isOnGround() && (!(entity instanceof Player) || !((Player) entity).isSneaking()))
-                                entity.setVelocity(direction.multiply(30 * speed));
-
-                            if (block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.SLIME_BLOCK) || block.getType().equals(Material.SLIME_BLOCK)) {
-                                Vector vector = entity.getVelocity();
-                                vector.setY(2.0);
-                                entity.setVelocity(vector);
-                            }
+                            if (entity.isOnGround() && (!(entity instanceof Player) || !((Player) entity).isSneaking())) entity.setVelocity(direction.multiply(30 * speed));
                         }
                     }
+
+//                    for (Entity entity : world.getEntities()) {
+//                        Block block = entity.getLocation().getBlock();
+//                        powerBlock(entity.getLocation());
+//
+//                        if (entity.isOnGround() && (!(entity instanceof Player) || !((Player) entity).isSneaking())) {
+//                            if (block.getType().equals(Material.REPEATER)) {
+//                                Repeater repeater = (Repeater) block.getBlockData();
+//
+//                                int speed = repeater.getDelay();
+//
+//                                Vector vector = faceToForce(repeater.getFacing().getOppositeFace()).multiply(30 * speed);
+//
+//                                if (repeater.isPowered()) {
+//                                    vector.setY(1);
+//                                }
+//
+//                                entity.setVelocity(vector);
+//                            }
+//
+//                            if (block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.PURPUR_STAIRS)) {
+//                                Stairs stairs = (Stairs) block.getLocation().subtract(0, 1, 0).getBlock().getBlockData();
+//                                Vector vector = faceToForce(stairs.getFacing().getOppositeFace()).multiply(30);
+//
+//                                if (stairs.getHalf().equals(Bisected.Half.BOTTOM)) {
+//                                    vector.setY(1);
+//                                }
+//
+//                                entity.setVelocity(vector);
+//                            }
+//
+//                            if (block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.SLIME_BLOCK)) {
+//                                Vector vector = new Vector(0, 0, 0);
+//                                vector.setY(1);
+//                                entity.setVelocity(vector);
+//                            }
+//                        }
+//                    }
                 }
             }, 10L, 1L);
         }
@@ -69,7 +110,7 @@ public class ConveyorBeltChecker {
     /**
      * Converts the provided face to a vector that is pointing in that direction
      *
-     * @param face
+     * @param face BlockFace
      * @return Vector with the direction
      */
     private static Vector faceToForce(BlockFace face) {
@@ -90,9 +131,9 @@ public class ConveyorBeltChecker {
     }
 
     /**
-     * Powers the block activating any redstone around
+     * Powers the block activating any redstone around the entity
      *
-     * @param location Location
+     * @param location Location of the entity
      */
     private void powerBlock(Location location) {
         int radius = new Config(ConveyorBelt.instance, false).get().getInt("radius");
